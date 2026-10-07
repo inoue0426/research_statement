@@ -1,14 +1,83 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\documentclass[11pt]{article}
 
-\title{research_statement}
-\author{inoue019 }
-\date{October 2026}
+\usepackage[margin=0.82in]{geometry}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{1.0em}{0.35em}
 
 \begin{document}
 
-\maketitle
+\begin{center}
+{\LARGE \textbf{Research Statement}}\\[0.35em]
+{\large Yoshitaka Inoue}\\[0.25em]
+\href{https://inoue0426.github.io/}{inoue0426.github.io}
+\end{center}
 
-\section{Introduction}
+\vspace{0.4em}
+
+\section*{Learning how biological systems respond to intervention}
+
+My research is organized around a simple question: \emph{what representation of a biological system is useful when the goal is to predict what will happen after we intervene?} In therapeutic discovery, this question appears at several scales. A model may need to predict whether a drug will work in a patient, how a cell state will change after treatment, which molecular mechanisms are likely to matter, or whether the evidence is too weak to support a confident conclusion. These problems are related, but they are often studied separately.
+
+I want to connect them. My long-term goal is to develop machine-learning methods that learn how interventions transform biological systems and that transfer those learned transformations across experimental settings, modalities, and eventually patients. I am especially interested in the gap between the data that are abundant and experimentally controllable---cell lines, perturbation screens, molecular profiling---and the settings in which we ultimately want to make decisions, where measurements are sparse, heterogeneous, and confounded.
+
+This perspective has emerged gradually from my work. My earlier research focused on drug-response prediction and interpretation, asking whether heterogeneous biological graphs could improve response prediction while identifying genes relevant to individual predictions. That led me to a second problem: even when a model proposes a drug--gene relationship, how should we decide whether that relationship is supported by existing evidence? I developed \textbf{DrugAgent} to study evidence-aware biomedical reasoning across databases, model predictions, and the scientific literature. More recently, I shifted from predicting treatment response directly from pretreatment data toward modeling the \emph{change induced by treatment}. In \textbf{PerturbRx}, we learn drug- and dose-conditioned latent transitions from single-cell perturbation data and transfer those transitions to patient profiles for treatment-response prediction \citep{inoue2026perturbrx}.
+
+Together, these projects have changed how I think about therapeutic machine learning. The central object should not always be a static representation of a cell, tumor, or drug. In many settings, the more useful object is the \emph{relationship between a state, an intervention, and the state that follows}.
+
+\section*{1. Intervention-conditioned representations}
+
+Large perturbational datasets now make it possible to observe biological systems under many controlled interventions. Single-cell atlases such as Tahoe-100M contain responses to thousands of drug--context combinations at a scale that was difficult to imagine only a few years ago \citep{zhang2025tahoe}. At the same time, foundation models provide increasingly expressive representations of cellular state \citep{hao2024scfoundation}. I see these developments not simply as an opportunity to train larger predictors, but as an opportunity to learn reusable \emph{operators of change}.
+
+Existing perturbation models have shown that latent-space arithmetic, factorized perturbation representations, and neural transport can capture aspects of cellular response and generalize across conditions \citep{lotfollahi2019scgen,lotfollahi2023cpa,bunne2023cellot}. A question I care about is what must be added for these representations to transfer beyond the experimental systems in which they were learned.
+
+PerturbRx is one step in this direction. Instead of using single-cell perturbation data only to predict another single-cell profile, we use the learned treatment-induced transition as a feature for a different downstream task: patient-level drug response. The transition model is trained on controlled perturbation data, then frozen and applied to pretreatment patient samples. This separation is important to me. It asks whether a model can learn something about the \emph{effect of an intervention} that remains useful after the cell line, cohort, and prediction task have changed.
+
+My next work in this area focuses on stricter forms of generalization. A model that performs well when the same compounds or cancer contexts are represented during training may still fail when both the intervention and biological background are unfamiliar. I therefore want to study generalization along explicit axes---unseen compounds, unseen biological contexts, and unseen compound--context combinations---rather than treating all held-out data as equivalent. I am also interested in identifying when a learned transition is genuinely transferable and when it is only a useful interpolation within the source domain.
+
+A longer-term goal is to move from one-step treatment effects toward models of \emph{intervention-conditioned biological dynamics}. This includes dose, time, combinations, treatment sequence, and adaptation. The scientific question is not merely whether a model can reconstruct a post-treatment expression profile. It is whether it can learn a representation of biological change that supports decisions in settings where the post-treatment state is not available.
+
+\section*{2. Which biological context should transfer?}
+
+Transfer is not only a problem of model architecture. It is also a problem of deciding which aspects of biological context should be preserved across source and target systems.
+
+Gene expression, mutation, copy number, methylation, spatial organization, morphology, and microenvironmental composition do not provide interchangeable views of the same system. Each modality exposes different constraints on how a system can respond. I therefore do not want to collapse every modality into a single universal embedding and assume that alignment itself solves transfer. Instead, I want to ask a more specific question: \emph{which features of context preserve the mechanisms needed to predict response to a particular intervention?}
+
+This leads to a second research direction in multimodal and spatial representations of biological context. For example, a transcriptional state may be sufficient to predict a direct pathway perturbation in one setting but insufficient when response depends on immune composition, cell--cell interaction, tissue architecture, or genomic background. A useful model should be able to discover this distinction.
+
+Methodologically, I am interested in structured alignment rather than unconditional alignment. One representation may need to preserve pathway activity, another cellular neighborhood, and another a genotype-dependent constraint. The objective should be to align source and target data only along the dimensions that are relevant to the intervention and downstream task. This view also creates a natural role for negative results: if a perturbation effect transfers across transcriptomic contexts but not across spatial or genomic contexts, that failure tells us something about what information the original representation omitted.
+
+I see this as a bridge between perturbation modeling and patient stratification. Instead of asking only, "which patients look similar before treatment?", we can ask, "which patients share the biological structure that makes the same treatment mechanism relevant?"
+
+\section*{3. Mechanism, evidence, and knowing when not to predict}
+
+Prediction alone is not enough for high-stakes biological use. Models should also help distinguish a plausible mechanism from a statistical shortcut and a supported hypothesis from an unsupported one.
+
+This motivation originally led me to DrugAgent. Biomedical evidence is fragmented across structured databases, experimental studies, predictive models, and literature, and those sources often disagree. I am interested in AI systems that do more than aggregate this information. They should reason about the \emph{type} of evidence, the context in which it was collected, and whether it is actually relevant to the current intervention and biological system.
+
+I want to connect this evidence-aware reasoning with intervention models. A learned transition can suggest that a treatment moves a system along a particular molecular direction; pathway and target evidence can suggest a possible mechanism; patient context can determine whether that mechanism is likely to remain active. These components should inform one another rather than live in separate pipelines.
+
+An equally important part of this direction is \textbf{abstention}. Biomedical models are frequently asked to extrapolate beyond the evidence available to them. In those settings, calibrated uncertainty is useful, but uncertainty alone does not explain \emph{why} a prediction should not be trusted. I am interested in models that can identify missing support more explicitly: the drug may be chemically unfamiliar, the target mechanism may be poorly established, the relevant cell state may be absent from training, or the patient context may violate the assumptions under which the perturbation effect was learned.
+
+The goal is a system that can say not only "I am uncertain," but also "the evidence required to transfer this intervention effect is missing here." This is both a machine-learning problem and a scientific reasoning problem.
+
+\section*{A research program centered on transfer}
+
+The common thread across these directions is transfer under intervention. I want to learn representations from experimental systems where interventions can be measured at scale, determine which biological structure makes those representations portable, and use mechanistic evidence to decide when transfer is justified.
+
+This program naturally combines representation learning, perturbation modeling, multimodal learning, causal questions, and scientific agents, but I do not see these as separate trends to be assembled for their own sake. They are tools for a specific problem: building models that remain scientifically useful as we move from controlled experiments toward heterogeneous biological and clinical settings.
+
+The practical benchmark I keep in mind is demanding. A model should be able to learn from one set of interventions and contexts, make useful predictions in another, explain what evidence supports the transfer, and recognize when the bridge between the two is too weak. If we can make progress on that problem, machine learning can become more than a way to fit existing biomedical datasets; it can become a way to connect experiments, mechanisms, and therapeutic decisions.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
 
 \end{document}
