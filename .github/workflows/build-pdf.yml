@@ -47,9 +47,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          cp main.pdf /tmp/main.pdf
+          sudo cp main.pdf /tmp/main.pdf
+          sudo chown "$(id -u):$(id -g)" /tmp/main.pdf
           git fetch origin main
           git checkout -B main origin/main
+          sudo rm -f main.pdf
           cp /tmp/main.pdf main.pdf
 
           git add main.pdf
