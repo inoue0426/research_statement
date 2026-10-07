@@ -1,0 +1,62 @@
+name: Build Research Statement
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.tex"
+      - "**/*.bib"
+      - ".github/workflows/build-pdf.yml"
+  pull_request:
+    paths:
+      - "**/*.tex"
+      - "**/*.bib"
+      - ".github/workflows/build-pdf.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+
+      - name: Upload compiled PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: Yoshitaka-Inoue-Research-Statement
+          path: main.pdf
+          if-no-files-found: error
+
+      - name: Commit compiled PDF to main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          cp main.pdf /tmp/main.pdf
+          git fetch origin main
+          git checkout -B main origin/main
+          cp /tmp/main.pdf main.pdf
+
+          git add main.pdf
+          if git diff --cached --quiet; then
+            echo "main.pdf is unchanged"
+            exit 0
+          fi
+
+          git commit -m "Update compiled research statement PDF"
+          git push origin HEAD:main
