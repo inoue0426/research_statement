@@ -1,10 +1,14 @@
 # Research Statement
 
+[![Build and publish](https://github.com/inoue0426/research_statement/actions/workflows/publish.yml/badge.svg)](https://github.com/inoue0426/research_statement/actions/workflows/publish.yml)
+
 Public research statement for **Yoshitaka Inoue**.
 
 My research focuses on machine learning for therapeutic intervention and biological dynamics: learning how treatments change biological systems, transferring those representations across experimental and patient contexts, and identifying when mechanistic evidence is strong enough to support a prediction.
 
 **Last updated: October 2026**
+
+Published version: <https://inoue0426.github.io/research_statement/>
 
 ## Research directions
 
