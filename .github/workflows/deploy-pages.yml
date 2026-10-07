@@ -1,12 +1,16 @@
 name: Deploy Research Statement
 
 on:
+  workflow_run:
+    workflows:
+      - "Build Research Statement"
+    types:
+      - completed
   push:
     branches:
       - main
     paths:
       - "index.html"
-      - "main.pdf"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
@@ -19,14 +23,18 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Prepare site
         run: |
+          test -f main.pdf
           mkdir -p public
           cp index.html public/index.html
           cp main.pdf public/main.pdf
