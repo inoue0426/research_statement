@@ -31,7 +31,7 @@ I want to connect them. My long-term goal is to develop machine-learning methods
 
 This perspective has emerged gradually from my work. My earlier research focused on drug-response prediction and interpretation, asking whether heterogeneous biological graphs could improve response prediction while identifying genes relevant to individual predictions. That led me to a second problem: even when a model proposes a drug--gene relationship, how should we decide whether that relationship is supported by existing evidence? I developed \textbf{DrugAgent} to study evidence-aware biomedical reasoning across databases, model predictions, and the scientific literature. More recently, I shifted from predicting treatment response directly from pretreatment data toward modeling the \emph{change induced by treatment}. In \textbf{PerturbRx}, we learn drug- and dose-conditioned latent transitions from single-cell perturbation data and transfer those transitions to patient profiles for treatment-response prediction \citep{inoue2026perturbrx}.
 
-Together, these projects have changed how I think about therapeutic machine learning. The central object should not always be a static representation of a cell, tumor, or drug. In many settings, the more useful object is the \emph{relationship between a state, an intervention, and the state that follows}.
+These projects have changed how I think about therapeutic machine learning. The central object should not always be a static representation of a cell, tumor, or drug. In many settings, the more useful object is the \emph{relationship between a state, an intervention, and the state that follows}.
 
 \section*{1. Intervention-conditioned representations}
 
