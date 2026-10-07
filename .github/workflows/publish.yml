@@ -1,0 +1,101 @@
+name: Build and publish research statement
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "main.tex"
+      - "references.bib"
+      - "README.md"
+      - ".github/workflows/publish.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_xelatex: false
+
+      - name: Prepare GitHub Pages site
+        shell: bash
+        run: |
+          mkdir -p public
+          cp main.pdf public/research_statement.pdf
+          cat > public/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Research Statement — Yoshitaka Inoue</title>
+            <meta name="description" content="Research statement by Yoshitaka Inoue.">
+            <style>
+              html, body { height: 100%; margin: 0; }
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: #f6f7f9;
+                color: #111;
+              }
+              header {
+                box-sizing: border-box;
+                min-height: 64px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding: 14px 24px;
+                background: #fff;
+                border-bottom: 1px solid #ddd;
+              }
+              h1 { font-size: 18px; margin: 0; font-weight: 600; }
+              nav { display: flex; gap: 14px; align-items: center; }
+              a { color: #0969da; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              main { height: calc(100% - 65px); }
+              iframe {
+                width: 100%;
+                height: 100%;
+                border: 0;
+                background: #fff;
+              }
+              @media (max-width: 640px) {
+                header { align-items: flex-start; flex-direction: column; padding: 12px 16px; }
+                main { height: calc(100% - 96px); }
+              }
+            </style>
+          </head>
+          <body>
+            <header>
+              <h1>Research Statement — Yoshitaka Inoue</h1>
+              <nav>
+                <a href="research_statement.pdf">PDF</a>
+                <a href="https://inoue0426.github.io/">Homepage</a>
+                <a href="https://github.com/inoue0426/research_statement">Source</a>
+              </nav>
+            </header>
+            <main>
+              <iframe src="research_statement.pdf" title="Research Statement PDF"></iframe>
+            </main>
+          </body>
+          </html>
+          EOF
+          touch public/.nojekyll
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          force_orphan: true
