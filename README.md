@@ -54,6 +54,15 @@ A multi-agent framework for integrating machine-learning, knowledge-graph, and l
 - [Preprint](https://arxiv.org/abs/2408.13378)
 - [Code](https://github.com/sciluna/DrugAgent)
 
+### Additional research foundations
+
+- **BiGCN** (bioRxiv, 2024): bi-graph convolution for single-cell transcriptome imputation.
+- **GraphPINE** (ICLR 2025 Workshop on Machine Learning for Genomics Explorations): interpretable graph importance propagation for drug response prediction.
+- **CellMinerCDB v2.2** (*Nucleic Acids Research*, 2026): cross-database cancer-cell-line pharmacogenomics resource.
+- **Drug discovery in the era of artificial intelligence** (*Health Data Science*, 2026): review of AI methods spanning target identification to clinical trials.
+
+These publications complement the selected projects above; PerturbRx is already listed as a preprint, rather than a peer-reviewed journal article.
+
 ## Source and build
 
 The statement is written in LaTeX:
